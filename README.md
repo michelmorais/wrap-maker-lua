@@ -94,7 +94,7 @@ int luaopen_dummyCalclua (lua_State *lua)
 }
 ```
 
-There are more code generated which were omitted for explanation purpose (*This is not the full code*).
+There are more generated code which were omitted for explanation purpose (*This is not the full code*).
 
 However the important to know is that those two files (dummyCalc**lua**.h and dummyCalc**lua**.cpp) are the wrapper generated.
 
