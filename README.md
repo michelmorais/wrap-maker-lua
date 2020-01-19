@@ -137,7 +137,7 @@ print(result)
 
 
 
-### What is the code behind of the wrapper?
+### What is the code behind the wrapper?
 
 
 The script **wrap-maker.lua** interpreted like this (two integers parameters and one result integer):
