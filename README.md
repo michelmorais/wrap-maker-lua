@@ -43,7 +43,7 @@ Here is where the **wrap-maker.lua** comes...
 
 ![alt text](https://raw.githubusercontent.com/michelmorais/wrap-maker-lua/master/images/first-run.png)
 
-As you can see, the only arg to **wrap-maker.lua** is the header file.
+As you can see, the only arg that **wrap-maker.lua** need is the header file.
 
 ![alt text](https://raw.githubusercontent.com/michelmorais/wrap-maker-lua/master/images/run-over-test-folder.png)
 
