@@ -98,9 +98,9 @@ There are more generated code which were omitted for explanation purpose (*This 
 
 Therefore the important to understand at this moment is that those two files (dummyCalc**lua**.h and dummyCalc**lua**.cpp) are the wrapper generated.
 
-You might need to adjust or solve some missing part *post-parse* however for this example it works just fine.
+You might need to adjust or solve some missing part *post-parse* for other libraries, however for this example it works just fine.
 
-### Now, using it is just needed to build the module.
+### Now, just use it to build the module.
 
 From test folder:
 
