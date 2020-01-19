@@ -12,7 +12,7 @@ The parser get a full path of a file (*.h) to parse and generate the needed wrap
 
 The idea behind is to facilitate some work that I have on my own engine and I thought it would be nice to share the work :)
 
-As as just explained, I use this to prototype some module in my engine, however, it generates a module compatible with [LUA 5.2.2](https://www.lua.org/manual/5.2/) which can also be used as pure module in **LUA**.
+As just explained, I use this to prototype some module in my engine, however, it generates a module compatible with [LUA 5.2.2](https://www.lua.org/manual/5.2/) which can also be used as pure module in **LUA**.
 
 ## Example
 
