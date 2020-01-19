@@ -277,11 +277,8 @@ class KEY_LUA_UPPER : public PLUGIN // class that represent the wrapper inherite
         v = 0;
     }
 
-    void onSubscribe(int width,int height,int identifierMetatablePluginEngine, void * context)
+    void onSubscribe(int width,int height, void * context)
     {
-        // This is the metatable identifier to the engine make sure that we can convert the userdata to ** KEY_LUA_UPPER (inherited from plugin)
-        IDENTIFIER_METATABLE_PLUGIN_ENGINE = identifierMetatablePluginEngine; //do not remove this
-
         //this are example, it can be removed
         width_window  = width;
         height_window = height;
@@ -378,7 +375,7 @@ KEY_LUA_UPPER *getKEY_PROJECTFromRawTable(lua_State *lua, const int rawi, const 
             lua_rawgeti(lua,-1, 1);
             const int L_USER_PLUGIN  = lua_tointeger(lua,-1);
             lua_pop(lua, 3);
-            if(L_USER_PLUGIN == IDENTIFIER_METATABLE_PLUGIN_ENGINE)//Is it really a plugin defined by the engine ?
+            if(L_USER_PLUGIN == PLUGIN_IDENTIFIER)//Is it really a plugin table?
             {
                 KEY_LUA_UPPER **ud = static_cast<KEY_LUA_UPPER **>(p);
                 if(ud && *ud)
@@ -458,10 +455,16 @@ REG_METHODS_KEY
     
     /* trick to ensure that we will receive a expected metatable type. */
     luaL_getmetatable(lua,"_mbm_plugin");//are we using the module in the mbm engine?
-    if(lua_type(lua,-1) != LUA_TTABLE) //No
+    if(lua_type(lua,-1) == LUA_TTABLE) //Yes
+    {
+        lua_rawgeti(lua,-1, 1);
+        PLUGIN_IDENTIFIER  = lua_tointeger(lua,-1);//update the identifier of plugin.
+        lua_pop(lua,1);
+    }
+    else
     {
         lua_pop(lua, 1);
-        lua_create_metatable_identifier(lua,"_mbm_plugin",IDENTIFIER_METATABLE_PLUGIN_ENGINE);//No, we just have to create a metatable to identify the module
+        lua_create_metatable_identifier(lua,"_mbm_plugin",PLUGIN_IDENTIFIER);//No, we just have to create a metatable to identify the module
     }
     lua_setmetatable(lua,-2);
     /* end trick */
@@ -518,7 +521,7 @@ class PLUGIN
     virtual ~PLUGIN() = default;
     //identifierMetatablePluginEngine is used by the engine to distinguish the plugin from any random table
     //subscribe plugin to engine's events passing information about width, height, identifier and context (will be handle in Windows env).
-    virtual void onSubscribe(int width,int height,int identifierMetatablePluginEngine, void * context) = 0; 
+    virtual void onSubscribe(int width,int height, void * context) = 0; 
     virtual void onTouchDown(int key, float x, float y) = 0;
     virtual void onTouchUp(int key, float x, float y) = 0;
     virtual void onTouchMove(int key, float x, float y) = 0;
@@ -536,7 +539,7 @@ class PLUGIN
     virtual void onDestroy() = 0 ;
 };
 
-static int IDENTIFIER_METATABLE_PLUGIN_ENGINE = -1; //this value is set by engine mbm through onSubscribe method. It is set in the metatable to make sure that we can convert the userdata to ** KEY_LUA_UPPER
+static int PLUGIN_IDENTIFIER = -1; //Identifier of table plugin. It is se automatically in the metatable to make sure that we can convert the userdata to ** KEY_LUA_UPPER
 
 KEY_LUA_UPPER *getKEY_PROJECTFromRawTable(lua_State *lua, const int rawi, const int indexTable);
 
