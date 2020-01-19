@@ -45,6 +45,9 @@ Here is where the **wrap-maker.lua** comes...
 
 As you can see, the only arg that **wrap-maker.lua** need is the header file.
 
+
+Let's parse our simple library **dummyCalc.h**:
+
 ![alt text](https://raw.githubusercontent.com/michelmorais/wrap-maker-lua/master/images/run-over-test-folder.png)
 
 Voila! Let's take a look what was created:
