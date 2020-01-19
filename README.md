@@ -140,7 +140,7 @@ print(result)
 ### What is the code behind the wrapper?
 
 
-The script **wrap-maker.lua** interpreted like this (two integers parameters and one result integer):
+The script **wrap-maker.lua** have interpreted for this example two parameters as integers and one result as integer:
 
 
 ```cpp
