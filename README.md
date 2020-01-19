@@ -132,7 +132,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:~/wrap-maker-lua/test/build"
 
 ```
 
-From lua interpreter use your module:
+From **LUA** interpreter use your module:
 
 ```lua
 
