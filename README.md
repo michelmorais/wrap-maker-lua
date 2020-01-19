@@ -10,7 +10,7 @@ The parser get a full path of a file (*.h) to parse and generate the needed wrap
 
 ## Example
 
-Let's create a simnple library in C++ to demonstarte how does the **wrap-maker.lua** works.
+Let's create a simple library in C++ to demonstrate how does the **wrap-maker.lua** works.
 
 #### dummyCalc.h
 ```cpp
