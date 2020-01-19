@@ -73,9 +73,9 @@ extern "C" DUMMYCALC_IMP_API int luaopen_dummyCalclua (lua_State * lua);
 
 ```cpp
 
-// code generated ... 
+// Some previously generated code, but not interested at the moment ...
 
-// The the main entry point
+// Then the main entry point
 
 int luaopen_dummyCalclua (lua_State *lua)
 {
