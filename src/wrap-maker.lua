@@ -413,6 +413,13 @@ int onDestroyKEY_NO_LUALua(lua_State *lua)
     return 0;
 }
 
+void lua_create_metatable_identifier(lua_State *lua,const char* _metatable_plugin,const int value)
+{
+    luaL_newmetatable(lua, _metatable_plugin);
+    lua_pushinteger(lua,value);
+    lua_rawseti(lua,-2,1);
+}
+
 ALL_METHODS_KEY
 
 int onTestKEY_NO_LUA(lua_State *lua)
@@ -421,15 +428,16 @@ int onTestKEY_NO_LUA(lua_State *lua)
     KEY_LUA_UPPER * that = getKEY_PROJECTFromRawTable(lua,1,1); //safely retrieve the plug-in class
 
     // we are expecting call like this: 
-    //       t_KEY_NO_LUA = require "KEY_NO_LUA" or   -- t_KEY_NO_LUA = KEY_NO_LUA.new()
-    //       t_KEY_NO_LUA:onTestKEY_NO_LUA()          -- pass itself as first arg
-    //       t_KEY_NO_LUA:onTestKEY_NO_LUA(1,'Hello') -- pass itself as first arg plus others args
+    //       t_dummycalc                    = require "dummycalc" or   -- t_dummycalc = dummycalc.new()
+    //       t_dummycalc:onTestdummycalc()          -- pass itself as first arg
+    //       t_dummycalc:onTestdummycalc(99) -- pass itself as first arg plus others args
     // it is safe to use the class:
 
-    that->v = (top > 1 && lua_type(lua,2) == LUA_TNUMBER) ? lua_tonumber(lua,2) : 0;
-    if(top > 2)
-        printf("%s",lua_tostring(lua,3));
-    return 0;
+    printf("old value %d\n",that->v);
+    that->v                                 = (top > 1 && lua_type(lua,2) == LUA_TNUMBER) ? lua_tonumber(lua,2) : 0;
+    printf("new value %d\n",that->v);
+    lua_pushinteger(lua,that->v); //return the new value
+    return 1;
 }
 
 int onNewKEY_NO_LUALua(lua_State *lua)
@@ -448,6 +456,16 @@ REG_METHODS_KEY
     KEY_LUA_UPPER * that         = new KEY_LUA_UPPER();
     *udata                    = that;
     
+    /* trick to ensure that we will receive a expected metatable type. */
+    luaL_getmetatable(lua,"_mbm_plugin");//are we using the module in the mbm engine?
+    if(lua_type(lua,-1) != LUA_TTABLE) //No
+    {
+        lua_pop(lua, 1);
+        lua_create_metatable_identifier(lua,"_mbm_plugin",IDENTIFIER_METATABLE_PLUGIN_ENGINE);//No, we just have to create a metatable to identify the module
+    }
+    lua_setmetatable(lua,-2);
+    /* end trick */
+
     lua_rawseti(lua, -2, 1);
     return 1;
 }
