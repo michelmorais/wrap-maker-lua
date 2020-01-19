@@ -277,7 +277,7 @@ class KEY_LUA_UPPER : public PLUGIN // class that represent the wrapper inherite
         v = 0;
     }
 
-    void onCreate(int width,int height,int identifierMetatablePluginEngine, void * context)
+    void onSubscribe(int width,int height,int identifierMetatablePluginEngine, void * context)
     {
         // This is the metatable identifier to the engine make sure that we can convert the userdata to ** KEY_LUA_UPPER (inherited from plugin)
         IDENTIFIER_METATABLE_PLUGIN_ENGINE = identifierMetatablePluginEngine; //do not remove this
@@ -516,10 +516,9 @@ class PLUGIN
     public:
     PLUGIN() noexcept = default;
     virtual ~PLUGIN() = default;
-    //width and height of window. 
     //identifierMetatablePluginEngine is used by the engine to distinguish the plugin from any random table
-    //context will be the handle in Windows env.
-    virtual void onCreate(int width,int height,int identifierMetatablePluginEngine, void * context) = 0; 
+    //subscribe plugin to engine's events passing information about width, height, identifier and context (will be handle in Windows env).
+    virtual void onSubscribe(int width,int height,int identifierMetatablePluginEngine, void * context) = 0; 
     virtual void onTouchDown(int key, float x, float y) = 0;
     virtual void onTouchUp(int key, float x, float y) = 0;
     virtual void onTouchMove(int key, float x, float y) = 0;
@@ -537,7 +536,7 @@ class PLUGIN
     virtual void onDestroy() = 0 ;
 };
 
-static int IDENTIFIER_METATABLE_PLUGIN_ENGINE = -1; //this value is set by engine mbm through onCreate method. It is set in the metatable to make sure that we can convert the userdata to ** KEY_LUA_UPPER
+static int IDENTIFIER_METATABLE_PLUGIN_ENGINE = -1; //this value is set by engine mbm through onSubscribe method. It is set in the metatable to make sure that we can convert the userdata to ** KEY_LUA_UPPER
 
 KEY_LUA_UPPER *getKEY_PROJECTFromRawTable(lua_State *lua, const int rawi, const int indexTable);
 
