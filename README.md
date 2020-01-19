@@ -73,25 +73,9 @@ extern "C" DUMMYCALC_IMP_API int luaopen_dummyCalclua (lua_State * lua);
 
 ```cpp
 
-int onNewdummycalcLua(lua_State *lua)
-{
-    const int  top                          = lua_gettop(lua);
-    lua_settop(lua, 0);
-    luaL_Reg regdummycalcMethods[]          = {  
-        {"sum", onSumdummyCalcLua },
-        {"test",  onTestdummycalc},//this method demonstrates how to get the class of a lua call
-        {nullptr, nullptr}};
+// code generated ... 
 
-    luaL_newlib(lua, regdummycalcMethods);
-    luaL_getmetatable(lua, "_mbmdummyCalc_LUA");
-    lua_setmetatable(lua, -2);
-    DUMMYCALC_LUA **udata                   = static_cast<DUMMYCALC_LUA **>(lua_newuserdata(lua, sizeof(DUMMYCALC_LUA *)));
-    DUMMYCALC_LUA * that                    = new DUMMYCALC_LUA();
-    *udata                                  = that;
-    
-    lua_rawseti(lua, -2, 1);
-    return 1;
-}
+// The the main entry point
 
 int luaopen_dummyCalclua (lua_State *lua)
 {
