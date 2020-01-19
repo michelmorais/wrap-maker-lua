@@ -1,6 +1,6 @@
 # wrap-maker-lua
 
-create wrap (modules) to be used in LUA (current version 5.2.2) based on include (*.h) from any library.
+Create wrap (modules) to be used in [LUA](https://www.lua.org/home.html) (current version [5.2.2](https://www.lua.org/manual/5.2/) ) based on include (*.h) from any library.
 
 ## How to
 
@@ -35,7 +35,7 @@ int sum(const int v1, const int v2)
 This is our library! pretty simple isn't?!
 
 
-Now, the point is that there is a similar way to make it as **module** to be used in LUA.
+Now, the point is that there is a similar way to make it as **module** to be used in [LUA](https://www.lua.org/home.html).
 
 Here is where the **wrap-maker.lua** comes...
 
@@ -167,6 +167,7 @@ int onSumdummyCalcLua(lua_State *lua)
 
 ```
 
+When you call **dummy.sum(2,5)** this is the code called behind in the module.
 
-That is it folks!
+That's all folks!
 
