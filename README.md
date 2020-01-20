@@ -159,7 +159,7 @@ int onSumdummyCalcLua(lua_State *lua)
 
 ```
 
-When you call **dummy.sum(2,5)** this is the code called behind in the module.
+When you call **dummy.sum(2,5)** this is the code called in the module.
 
 That's all folks!
 
