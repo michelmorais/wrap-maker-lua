@@ -269,85 +269,18 @@ KEY_FREE_CODE
 
 KEY_BUILT_DECLARATION
 
-class KEY_LUA_UPPER : public PLUGIN // class that represent the wrapper inherited from plugin (used by the engine)
+#ifdef  PLUGIN_CALLBACK
+    class KEY_LUA_UPPER : public PLUGIN // class that represent the plugin in the engine
+#else
+    class KEY_LUA_UPPER
+#endif
 {
     public:
     KEY_LUA_UPPER()
     {
         v = 0;
     }
-
-    void onSubscribe(int width,int height, void * context)
-    {
-        //this are example, it can be removed
-        width_window  = width;
-        height_window = height;
-    }
-
-    void onTouchDown(int key, float x, float y)
-    {
-
-    }
-    void onTouchUp(int key, float x, float y)
-    {
-
-    }
-    void onTouchMove(int key, float x, float y)
-    {
-
-    }
-    void onTouchZoom(float zoom)
-    {
-
-    }
-    void onKeyDown(int key)
-    {
-
-    }
-    void onKeyUp(int key)
-    {
-
-    }
-    void onDoubleClick(float x, float y, int key)
-    {
-
-    }
-    void onKeyDownJoystick(int, int)
-    {
-
-    }
-    void onKeyUpJoystick(int, int)
-    {
-
-    }
-    void onMoveJoystick(int, float, float, float,float)
-    {
-
-    }
-    void onInfoDeviceJoystick(int, int, const char *,const char *)
-    {
-
-    }
-    void onBeginRender() 
-    {
-
-    }
-    void onLoop(float delta)
-    {
-
-    }
-    void onEndRender() 
-    {
-
-    }
-    void onDestroy() 
-    {
-
-    }
-
     int v; //example some field to this wrapper
-    int width_window; //example of others field to this wrapper
-    int height_window; //example of others field to this wrapper
 };
 
 //this method is able to (securely) obtain the class (user data) of any arguments passed by lua indicating by indexTable. rawi normally is set to 1 (first element in the metatable)
@@ -514,30 +447,9 @@ local sKeyFreeCode =
     If there is no intent to use this module in the engine there is no problem. It can be used as normal module in lua.
 */
 
-class PLUGIN
-{   //The methods on Plugin are the real order call from mbm engine
-    public:
-    PLUGIN() noexcept = default;
-    virtual ~PLUGIN() = default;
-    //identifierMetatablePluginEngine is used by the engine to distinguish the plugin from any random table
-    //subscribe plugin to engine's events passing information about width, height, identifier and context (will be handle in Windows env).
-    virtual void onSubscribe(int width,int height, void * context) = 0; 
-    virtual void onTouchDown(int key, float x, float y) = 0;
-    virtual void onTouchUp(int key, float x, float y) = 0;
-    virtual void onTouchMove(int key, float x, float y) = 0;
-    virtual void onTouchZoom(float zoom) = 0;
-    virtual void onKeyDown(int key) = 0;
-    virtual void onKeyUp(int key) = 0;
-    virtual void onDoubleClick(float x, float y, int key) = 0;
-    virtual void onKeyDownJoystick(int, int) = 0;
-    virtual void onKeyUpJoystick(int, int) = 0;
-    virtual void onMoveJoystick(int, float, float, float,float) = 0;
-    virtual void onInfoDeviceJoystick(int, int, const char *,const char *) = 0;
-    virtual void onBeginRender() = 0 ;
-    virtual void onLoop(float delta) = 0;
-    virtual void onEndRender() = 0 ;
-    virtual void onDestroy() = 0 ;
-};
+#ifdef  PLUGIN_CALLBACK
+    #include <plugin-callback.h>
+#endif
 
 static int PLUGIN_IDENTIFIER = -1; //Identifier of table plugin. It is se automatically in the metatable to make sure that we can convert the userdata to ** KEY_LUA_UPPER
 
