@@ -10,7 +10,9 @@ The parser get a full path of a file (*.h) to parse and generate the needed wrap
 
 ## Motivation
 
-The idea behind is to facilitate some work that I have on my own engine and I thought it would be nice to share the work :)
+The idea behind this is to facilitate some work that I have on my own engine and I thought it would be nice to share the work :)
+
+There are a lot of useful libraries in C/C++ that has not a wrapper to **LUA** or if has, is not a pure. That is my main motivation. To easily use modules in **LUA** to be able to integrate to my project but in a isolated way (Not a really dependency).
 
 As just explained, I use this to prototype some module in my engine, however, it generates a module compatible with [LUA 5.2.2](https://www.lua.org/manual/5.2/) which can also be used as pure module in **LUA**.
 
