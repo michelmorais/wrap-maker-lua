@@ -1669,7 +1669,7 @@ tParser.parse = function(self,sFilenameIn)
             
             local bCommentFromLine , sComment  = getCommentFromOriginalLine(tMethod.sOriginalLine)
             if bCommentFromLine then
-                sDocument = sDocument .. sComment:gsub('::',':'):gsub('%*',' * ') .. '\n'
+                sDocument = sDocument .. self.sAlign .. sComment:gsub('::',':'):gsub('%*',' * ') .. '\n'
                 tMethod.sMethodDefinition = tMethod.sLuaSignature .. '\n{\n' .. self.sAlign .. '// ' .. sComment .. '\n' .. self.sAlign ..  'int index_input = 1;' .. self.sEndLine
             else
                 tMethod.sMethodDefinition = tMethod.sLuaSignature .. '\n{\n' .. self.sAlign .. 'int index_input = 1;' .. self.sEndLine
@@ -1698,9 +1698,9 @@ tParser.parse = function(self,sFilenameIn)
                 if tMethod.sReturnType == 'char' then
                     sDocument = sDocument .. self.sAlign .. ':return: ``string`` - *' .. sReturnVariableName .. '*\n'
                 elseif tMethod.sReturnType == 'bool' then
-                    sDocument = sDocument .. self.sAlign .. ':return: ``boolean`` - *' .. sReturnVariableName .. '*\n'
+                    sDocument = sDocument .. self.sAlign .. ':return: ``boolean`` - *result*\n'
                 elseif self:is_primitive_type(tMethod.sReturnType) then
-                    sDocument = sDocument .. self.sAlign .. ':return: ``number`` - *' .. sReturnVariableName .. '*\n'
+                    sDocument = sDocument .. self.sAlign .. ':return: ``number`` - *value*\n'
                 else
                     sDocument = sDocument .. self.sAlign .. ':return: ``table`` - *' .. sReturnVariableName .. '*\n'
                 end
