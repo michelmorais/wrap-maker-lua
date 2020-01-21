@@ -1694,15 +1694,14 @@ tParser.parse = function(self,sFilenameIn)
             end
 
             if tMethod.sReturnType ~= 'void' then
-                local sReturnVariableName = string.format('ret_%s',tMethod.sReturnType)
                 if tMethod.sReturnType == 'char' then
-                    sDocument = sDocument .. self.sAlign .. ':return: ``string`` - *' .. sReturnVariableName .. '*\n'
+                    sDocument = sDocument .. self.sAlign .. ':return: ``string`` - *' .. tMethod.sReturnType .. '*\n'
                 elseif tMethod.sReturnType == 'bool' then
                     sDocument = sDocument .. self.sAlign .. ':return: ``boolean`` - *result*\n'
                 elseif self:is_primitive_type(tMethod.sReturnType) then
                     sDocument = sDocument .. self.sAlign .. ':return: ``number`` - *value*\n'
                 else
-                    sDocument = sDocument .. self.sAlign .. ':return: ``table`` - *' .. sReturnVariableName .. '*\n'
+                    sDocument = sDocument .. self.sAlign .. ':return: ``table`` - *' .. tMethod.sReturnType .. '*\n'
                 end
             end
 
