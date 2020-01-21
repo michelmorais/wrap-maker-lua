@@ -29,6 +29,7 @@ The version of LUA tested is 5.2
 
 tParser = { bEnableDebugToFile = false,  -- bEnableDebugToFile on will force to save parse in file
             iIncrementalNumber              = 1,
+            bLowerCaseMethodLua             = false,
             tPrimitiveType                  = {},
             tMethodLuaPopName               = {},
             tMethodLuaPopPointerName        = {},
@@ -280,7 +281,7 @@ KEY_BUILT_DECLARATION
     {
         v = 0;
     }
-    int v; //example some field to this wrapper
+    int v; //example of a field for this wrapper
 };
 
 //this method is able to (securely) obtain the class (user data) of any arguments passed by lua indicating by indexTable. rawi normally is set to 1 (first element in the metatable)
@@ -1350,11 +1351,16 @@ end
 
 tParser.generate_reg_methods = function(self,tMethods)
 
-    local function reg_method(tMethod,iMaxLen)
+    local function reg_method(tMethod,iMaxLen,bLowerCaseMethodLua)
         local sMethodName       = tMethod.sMethodName
         local method_name_upper = sMethodName:sub(1,1):upper() .. sMethodName:sub(2)
-        local method_name_lower = sMethodName:sub(1,1):lower() .. sMethodName:sub(2)
-        local str = string.format('{\"%s\",|%s },',method_name_lower,tMethod.method_name_lua)
+        local method_name_lua
+        if bLowerCaseMethodLua then
+            method_name_lua = sMethodName:sub(1,1):lower() .. sMethodName:sub(2)
+        else
+            method_name_lua = sMethodName
+        end
+        local str = string.format('{\"%s\",|%s },',method_name_lua,tMethod.method_name_lua)
         if str:len() < iMaxLen then
             local t = iMaxLen - str:len()
             local sSpace = string.rep(' ',t)
@@ -1369,7 +1375,7 @@ tParser.generate_reg_methods = function(self,tMethods)
     for i = 1, #tMethods do
         local tMethod = tMethods[i]
         
-        local sReg = reg_method(tMethod,0)
+        local sReg = reg_method(tMethod,0,self.bLowerCaseMethodLua)
         if sReg:len() > iMaxLen then
             iMaxLen = sReg:len()
         end
@@ -1383,7 +1389,7 @@ tParser.generate_reg_methods = function(self,tMethods)
     
     for i = 1, #tMethods do
         local tMethod    = tMethods[i]
-        local sReg       = reg_method(tMethod,iMaxLen)
+        local sReg       = reg_method(tMethod,iMaxLen,self.bLowerCaseMethodLua)
         if not tAllRegFunction[sReg] then
             tAllRegFunction[sReg] = true
             table.insert(tRet,'        ' .. sReg)
@@ -1632,15 +1638,21 @@ tParser.parse = function(self,sFilenameIn)
         local tMethod    = tMethods[i]
         if tMethod.sMethodName and tMethod.sReturnType and tMethod.tParameters then
             local method_name_upper   = tMethod.sMethodName:sub(1,1):upper() .. tMethod.sMethodName:sub(2)
-            local method_name_lower   = tMethod.sMethodName:sub(1,1):lower() .. tMethod.sMethodName:sub(2)
+            local method_name_lua
+            if self.bLowerCaseMethodLua then
+                method_name_lua   = tMethod.sMethodName:sub(1,1):lower() .. tMethod.sMethodName:sub(2)
+            else
+                method_name_lua   = tMethod.sMethodName
+            end
+
             tMethod.method_name_lua   = string.format('on%s%sLua',method_name_upper,(self.sProjectName or ''))
             tMethod.sLuaSignature     = string.format('int %s(lua_State *lua)',tMethod.method_name_lua)
             --start of method
 
-            local sDocument = string.format('%s\n%s\n\n',method_name_lower:trim(),string.rep('^',method_name_lower:trim():len()))
+            local sDocument = string.format('%s\n%s\n\n',method_name_lua:trim(),string.rep('^',method_name_lua:trim():len()))
 
             if #tMethod.tParameters > 0 then
-                sDocument = sDocument .. '\n\n.. data:: ' .. method_name_lower .. '('
+                sDocument = sDocument .. '\n\n.. data:: ' .. method_name_lua .. '('
                 for j=1, #tMethod.tParameters do
                     local tVariable = tMethod.tParameters[j]
                     tVariable.sName  = tVariable.sName or self:generate_name(tVariable.sType)
@@ -1651,7 +1663,7 @@ tParser.parse = function(self,sFilenameIn)
                     end
                 end
             else
-                sDocument = sDocument .. '\n\n.. data:: ' .. method_name_lower .. '()\n\n'
+                sDocument = sDocument .. '\n\n.. data:: ' .. method_name_lua .. '()\n\n'
             end
             
             
@@ -1662,9 +1674,42 @@ tParser.parse = function(self,sFilenameIn)
             else
                 tMethod.sMethodDefinition = tMethod.sLuaSignature .. '\n{\n' .. self.sAlign .. 'int index_input = 1;' .. self.sEndLine
             end
+
+            if #tMethod.tParameters > 0 then
+                sDocument = sDocument .. '\n'
+                for j=1, #tMethod.tParameters do
+                    local tVariable = tMethod.tParameters[j]
+                    if tVariable.sType == 'char' and tVariable.isPointer then
+                        sDocument = sDocument .. self.sAlign .. ':param string: **' .. tVariable.sName .. '**\n'
+                    elseif tVariable.sType == 'bool' then
+                        sDocument = sDocument .. self.sAlign .. ':param boolean: **' .. tVariable.sName .. '**\n'
+                    elseif self:is_primitive_type(tVariable.sType) then
+                        sDocument = sDocument .. self.sAlign .. ':param number: **' .. tVariable.sName .. '**\n'
+                    else
+                        sDocument = sDocument .. self.sAlign .. ':param table: **' .. tVariable.sName .. '**\n'
+                    end
+                end
+            elseif tMethod.sReturnType ~= 'void' then
+                sDocument = sDocument .. '\n'
+            end
+
+            if tMethod.sReturnType ~= 'void' then
+                local sReturnVariableName = string.format('ret_%s',tMethod.sReturnType)
+                if tMethod.sReturnType == 'char' then
+                    sDocument = sDocument .. self.sAlign .. ':return: ``string`` - *' .. sReturnVariableName .. '*\n'
+                elseif tMethod.sReturnType == 'bool' then
+                    sDocument = sDocument .. self.sAlign .. ':return: ``boolean`` - *' .. sReturnVariableName .. '*\n'
+                elseif self:is_primitive_type(tMethod.sReturnType) then
+                    sDocument = sDocument .. self.sAlign .. ':return: ``number`` - *' .. sReturnVariableName .. '*\n'
+                else
+                    sDocument = sDocument .. self.sAlign .. ':return: ``table`` - *' .. sReturnVariableName .. '*\n'
+                end
+            end
+
+
             local sInstanceLuaExampleName = string.format('t%s',self.sProjectName)
             sDocument = sDocument .. '\n*Example:*\n\n.. code-block:: lua\n\n' 
-            local sDocumentCallMethod = sInstanceLuaExampleName .. '.' .. method_name_lower .. '('
+            local sDocumentCallMethod = sInstanceLuaExampleName .. '.' .. method_name_lua .. '('
             local sVarDocument = self.sAlign .. sInstanceLuaExampleName .. ' = ' .. ' require "' .. self.sProjectName .. '"\n'
 
             
@@ -1713,7 +1758,7 @@ tParser.parse = function(self,sFilenameIn)
 
             sDocument = sDocument .. self:self_align(sVarDocument,'=') ..self.sAlign .. sDocumentCallMethod
             
-            table.insert(tDocumentCommonMethods,{_3letters = method_name_lower:sub(1,3), method_name_lower = method_name_lower , sRst = sDocument .. '\n'})
+            table.insert(tDocumentCommonMethods,{_3letters = method_name_lua:sub(1,3), method_name_lua = method_name_lua , sRst = sDocument .. '\n'})
             
             if bHasDefaultParameter then
                 tMethod.sMethodDefinition = tMethod.sMethodDefinition .. 'const int top = lua_gettop(lua);' .. self.sEndLine
@@ -1898,7 +1943,7 @@ tParser.parse = function(self,sFilenameIn)
         local tCompareName = {}
         local tCurrent = tDocumentCommonMethods[i]
         if tCurrent.iCount == nil then
-            table.insert(tCompareName,tCurrent.method_name_lower)
+            table.insert(tCompareName,tCurrent.method_name_lua)
             tCurrent.iCount = 1
             local sCurrent3Ltters = tCurrent._3letters
             for j=i+1, #tDocumentCommonMethods do
@@ -1906,7 +1951,7 @@ tParser.parse = function(self,sFilenameIn)
                 local sNextLtters = tNext._3letters
                 if sNextLtters == sCurrent3Ltters then
                     tCurrent.iCount = tCurrent.iCount + 1
-                    table.insert(tCompareName,tNext.method_name_lower)
+                    table.insert(tCompareName,tNext.method_name_lua)
                     for k=i+1, j do
                         local tInner = tDocumentCommonMethods[i]
                         tInner.iCount = tCurrent.iCount
